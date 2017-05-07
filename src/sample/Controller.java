@@ -10,8 +10,8 @@ import java.io.*;
 public class Controller {
     public TextField textField;
     public TextArea textArea;
-    static String tstat;
-    static int id;
+    private static String tstat;
+    private static int id;
     public void pogoda() throws IOException {
         tstat = textField.getText();
         textField.clear();
@@ -21,34 +21,30 @@ public class Controller {
         int stad = 0;
         textArea.clear();
         textArea.appendText("Вы ввели что то не то!)))\n Введите начало слова, выберите подходящий вариант\n И введите еще раз правильно!\n Ввести можно название города или id\n К примеру: (моск), если ищите Москву\n\n");
+        //Блок поиска города в базе
         while (reader.ready()){
-            if(tstat!=" ") {
-                if ((sd = reader.readLine().toLowerCase()).contains(tstat.toLowerCase())) {//Проверяем есть в строке похожее
-                    temp = sd.split(" : ");
-                    if (temp[1].equals(tstat.toLowerCase())) {//Проверяем наличие точного совпадения
-                        stad = Integer.parseInt(temp[0]);
-                        break;
-                    } else {
-                        if (temp[1].startsWith(tstat.toLowerCase())) {
-                            textField.clear();
-                            textArea.appendText("id "+temp[0]+sd.substring(sd.indexOf(" ")) + "\n");//Выводит варианты пожие на введенный
-                        }
-                    }
-                    try {
-                        id=Integer.parseInt(tstat);//Вывод города по id
-                        stad=id;
-                    }catch (Exception e){
-                        break;
-                    }
+            try {
+                id = Integer.parseInt(tstat);//Вывод города по id
+                stad = id;
+            } catch (Exception e) {
+            }
+            sd = reader.readLine();
+            temp = sd.split(" : ");
+            if (temp[1].toLowerCase().equals(tstat.toLowerCase())) {//Проверяем наличие точного совпадения
+                System.out.println(temp[1]);
+                stad = Integer.parseInt(temp[0]);
+                break;
+            } else {
+                if (temp[1].toLowerCase().startsWith(tstat.toLowerCase())) {
+                    textField.clear();
+                    textArea.appendText("id "+temp[0]+sd.substring(sd.indexOf(" ")) + "\n");//Выводит варианты похожие на введенный
                 }
             }
         }
-//        FileWriter writer = new FileWriter("c:/3.txt");
-//        writer.write(reader.readLine());
-//        reader.close();
-//        writer.close();
+        reader.close();
+        //Блок парсинга с сайта
         if(stad!=0) {
-            Document doc = Jsoup.connect("http://pogodnik.com/" + stad).get();
+            Document doc = Jsoup.connect("http://pogodnik.com/" + stad).get();//сайт с которого парсим
 
             Elements All = doc.getElementsByAttributeValue("class", "small");
             Elements wo = doc.getElementsByAttributeValue("class", "mci-cont");
@@ -68,4 +64,3 @@ public class Controller {
         }
     }
 }
-
