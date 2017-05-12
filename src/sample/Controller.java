@@ -1,4 +1,5 @@
 package sample;
+import com.google.gson.Gson;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import org.jsoup.Jsoup;
@@ -13,6 +14,7 @@ public class Controller {
     private static String tstat;
     private static int id;
     public void pogoda() throws IOException {
+        Gson gson = new Gson();
         tstat = textField.getText();
         textField.clear();
         BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream("listStad.txt"), "UTF-8"));
@@ -31,7 +33,6 @@ public class Controller {
             sd = reader.readLine();
             temp = sd.split(" : ");
             if (temp[1].toLowerCase().equals(tstat.toLowerCase())) {//Проверяем наличие точного совпадения
-                System.out.println(temp[1]);
                 stad = Integer.parseInt(temp[0]);
                 break;
             } else {
@@ -42,6 +43,9 @@ public class Controller {
             }
         }
         reader.close();
+
+
+
         //Блок парсинга с сайта
         if(stad!=0) {
             Document doc = Jsoup.connect("http://pogodnik.com/" + stad).get();//сайт с которого парсим
@@ -57,6 +61,8 @@ public class Controller {
                 String f = test.get(i) + "";
                 int start = f.indexOf("title");
                 int end = f.indexOf("alt");
+                String json = gson.toJson(All.get(d).text()+" "+f.substring(start + 7, end - 2));
+                System.out.println(All.get(d).text());
                 textArea.appendText(All.get(d).text() + "\n");
                 textArea.appendText(f.substring(start + 7, end - 2) + "\n\n");
                 d++;
